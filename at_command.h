@@ -46,7 +46,7 @@
 	_( AT_CNUM,         "AT+CNUM") \
 \
 	_( AT_COPS,         "AT+COPS?") \
-	_( AT_COPS_INIT,    "AT+COPS=") \
+	_( AT_COPS_INIT,    "AT+COPS") \
 	_( AT_CPIN,         "AT+CPIN?") \
 	_( AT_CPMS,         "AT+CPMS") \
 \
