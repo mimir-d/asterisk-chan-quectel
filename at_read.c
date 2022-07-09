@@ -24,6 +24,7 @@
 #include "chan_quectel.h"
 #include "at_read.h"
 #include "ringbuffer.h"
+#include "logger.h"
 
 
 /*!
@@ -76,6 +77,12 @@ EXPORT_DEF ssize_t at_read (int fd, const char * dev, struct ringbuffer* rb)
 		{
 			rb_write_upd (rb, n);
 
+			quectel_logger_write(
+				"[%s] AT read (size=%d): %.*s",
+				dev,
+				n,
+				n, (char*)rb->buffer + rb->read
+			);
 			ast_debug (5, "[%s] receive %zu byte, used %zu, free %zu, read %zu, write %zu\n",
 				dev, n, rb_used (rb), rb_free (rb), rb->read, rb->write);
 

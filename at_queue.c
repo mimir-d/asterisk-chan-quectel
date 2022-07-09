@@ -197,6 +197,8 @@ EXPORT_DEF int at_write (struct pvt* pvt, const char* buf, size_t count)
 		ast_debug (1, "[%s] write() error: %d\n", PVT_ID(pvt), errno);
 	}
 
+	
+	quectel_logger_write("[%s] AT write (size=%d): %s", PVT_ID(pvt), count, buf);
 	return wrote != count;
 }
 

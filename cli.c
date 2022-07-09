@@ -13,6 +13,7 @@
 #include <asterisk.h>
 #include <asterisk/cli.h>			/* struct ast_cli_entry; struct ast_cli_args */
 #include <asterisk/callerid.h>			/* ast_describe_caller_presentation() */
+#include <asterisk/logger.h>
 
 #include "ast_compat.h"				/* asterisk compatibility fixes */
 
@@ -21,6 +22,7 @@
 #include "helpers.h"				/* ITEMS_OF() send_ccwa_set() send_reset() send_sms() send_ussd() */
 #include "pdiscovery.h"				/* pdiscovery_list_begin() pdiscovery_list_next() pdiscovery_list_end() */
 #include "error.h"
+#include "logger.h"
 
 static const char * restate2str_msg(restate_time_t when);
 
@@ -851,6 +853,42 @@ static char * cli_discovery(struct ast_cli_entry * e, int cmd, struct ast_cli_ar
 	return CLI_SUCCESS;
 }
 
+/* ---- logging ---- */
+
+static char* cli_set_logger(struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	if (cmd == CLI_INIT) {
+		e->command = "quectel set logger";
+		e->usage = "Usage: quectel set logger {on|off}\n"
+			   "       Enable or disable logging of AT commands\n";
+		return NULL;
+	}
+	else if (cmd == CLI_GENERATE) {
+		return NULL;
+	}
+
+	if (e->args < 3)
+		return CLI_SHOWUSAGE;
+	const char* what = a->argv[3];
+	
+	if (!strcasecmp(what, "on")) {
+		quectel_enable_logger();
+
+		if (a->fd >= 0) {
+			ast_cli(a->fd, "Quectel logging enabled for AT commands\n");
+		}
+		return CLI_SUCCESS;
+	}
+	else if (!strcasecmp(what, "off")) {
+		quectel_disable_logger();
+
+		if (a->fd >= 0) {
+			ast_cli(a->fd, "Quectel logging disabled\n");
+		}
+		return CLI_SUCCESS;
+	}
+	return CLI_SHOWUSAGE;
+}
 
 
 static struct ast_cli_entry cli[] = {
@@ -872,6 +910,8 @@ static struct ast_cli_entry cli[] = {
 
 	AST_CLI_DEFINE (cli_start,		"Start quectel"),
 	AST_CLI_DEFINE (cli_discovery,		"Discovery devices and create config"),
+
+	AST_CLI_DEFINE (cli_set_logger,		"Enable/Disable AT commands logging"),
 };
 
 #/* */

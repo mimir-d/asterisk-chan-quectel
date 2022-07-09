@@ -73,7 +73,7 @@ ASTERISK_FILE_VERSION(__FILE__, "$Rev: " PACKAGE_REVISION " $")
 #include "smsdb.h"
 #include "error.h"
 #include "errno.h"
-
+#include "logger.h"
 
 
 
@@ -1871,6 +1871,11 @@ static int load_module()
 {
 	int rv;
 
+	if (!quectel_logger_alloc()) {
+		ast_log(LOG_ERROR, "Unable to allocate logger struct\n");
+		return AST_MODULE_LOAD_DECLINE;
+	}
+
 	gpublic = ast_calloc(1, sizeof(*gpublic));
 	if(gpublic)
 	{
@@ -2000,6 +2005,8 @@ static int unload_module()
 	ast_free(gpublic);
 	smsdb_atexit();
 	gpublic = NULL;
+
+	quectel_logger_dealloc();	
 	return 0;
 }
 
