@@ -35,11 +35,11 @@
  * \retval 0 timeout
  */
 
-EXPORT_DEF int at_wait (int fd, int* ms)
+EXPORT_DEF int at_wait (int fd, int ms)
 {
 	int exception, outfd;
 
-	outfd = ast_waitfor_n_fd (&fd, 1, ms, &exception);
+	outfd = ast_waitfor_n_fd (&fd, 1, &ms, &exception);
 
 	if (outfd < 0)
 	{

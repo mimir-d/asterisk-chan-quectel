@@ -505,7 +505,7 @@ static int pdiscovery_do_cmd(const struct pdiscovery_request * req, int fd, cons
 	if(wrote == length) {
 		timeout = PDISCOVERY_TIMEOUT;
 		rb_init(&rb, buf, sizeof(buf) - 1);
-		while(timeout > 0 && at_wait(fd, &timeout) != 0) {
+		while(timeout > 0 && at_wait(fd, timeout) != 0) {
 			iovcnt = at_read(fd, name, &rb);
 			if(iovcnt > 0) {
 				iovcnt = rb_read_all_iov(&rb, iov);

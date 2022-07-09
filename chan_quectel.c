@@ -543,10 +543,9 @@ EXPORT_DEF void clean_read_data(const char * devname, int fd)
 	char buf[2*1024];
 	struct ringbuffer rb;
 	int iovcnt;
-	int t;
 
 	rb_init (&rb, buf, sizeof (buf));
-	for (t = 0; at_wait(fd, &t); t = 0)
+	for (int timeout = 0; at_wait(fd, timeout); timeout = 0)
 	{
 		iovcnt = at_read (fd, devname, &rb);
 		ast_debug (4, "[%s] drop %u bytes of pending data before initialization\n", devname, (unsigned)rb_used(&rb));
@@ -591,7 +590,6 @@ static void* do_monitor_phone (void* data)
 	struct pvt*	pvt = (struct pvt*) data;
 	at_res_t	at_res;
 	const struct at_queue_cmd * ecmd;
-	int		t;
 	char buf[2*1024];
 	struct ringbuffer rb;
 	struct iovec	iov[2];
@@ -655,17 +653,17 @@ static void* do_monitor_phone (void* data)
 			goto e_restart;
 		}
 
-		t = at_queue_timeout(pvt);
-		if(t < 0)
-			t = pvt->timeout;
+		int timeout = at_queue_timeout(pvt);
+		if (timeout < 0)
+			timeout = pvt->timeout;
 
 		ast_mutex_unlock (&pvt->lock);
 
-		if (!at_wait (fd, &t))
+		if (!at_wait (fd, timeout))
 		{
 			ast_mutex_lock (&pvt->lock);
 			ecmd = at_queue_head_cmd (pvt);
-			if(ecmd)
+			if (ecmd)
 			{
 				ast_log (LOG_ERROR, "[%s] timedout while waiting '%s' in response to '%s'\n", dev, at_res2str (ecmd->res), at_cmd2str (ecmd->cmd));
 				goto e_cleanup;
